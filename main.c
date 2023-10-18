@@ -3,13 +3,14 @@
 #include <string.h>
 
 #define BUFSIZE 256
+#define MAX_SUGGESTIONS 10
 
 typedef struct item {
     char *word;
     int weight;
 } Item;
 
-// Function to compare items by weight for sorting
+// Function to compare items based on weight
 int compareItems(const void *a, const void *b) {
     return ((Item *)b)->weight - ((Item *)a)->weight;
 }
@@ -17,46 +18,38 @@ int compareItems(const void *a, const void *b) {
 int main(int argc, char **argv) {
     if (argc != 3) {
         fprintf(stderr, "Usage: %s <knowledge_base_file> <query_list_file>\n", argv[0]);
-        return 1;
+        return -1;
     }
 
     char *dictionaryFilePath = argv[1];
     char *queryFilePath = argv[2];
-
     int wordCount = 0;
     int queryCount = 0;
 
-    // Read the knowledge base file
+    // Read the knowledge base file and store the data in an array of Items
     FILE *fp = fopen(dictionaryFilePath, "r");
     if (fp == NULL) {
         fprintf(stderr, "Error opening file: %s\n", dictionaryFilePath);
         return -1;
     }
 
+    Item *dictionary = NULL;
+
     char word[BUFSIZE];
     int weight;
-    while (fscanf(fp, "%s %d\n", word, &weight) == 2) {
+
+    while (fscanf(fp, "%s %d\n", word, &weight) != EOF) {
         wordCount++;
+        dictionary = (Item *)realloc(dictionary, wordCount * sizeof(Item));
+        dictionary[wordCount - 1].word = strdup(word);
+        dictionary[wordCount - 1].weight = weight;
     }
 
-    // Allocate memory for dictionary items
-    Item *dictionary = (Item *)malloc(wordCount * sizeof(Item));
-    if (dictionary == NULL) {
-        fprintf(stderr, "Memory allocation error.\n");
-        return -1;
-    }
-
-    // Read the knowledge base file again and store data
-    fseek(fp, 0, SEEK_SET);
-    for (int i = 0; i < wordCount; i++) {
-        fscanf(fp, "%s %d\n", word, &weight);
-        dictionary[i].word = strdup(word);
-        dictionary[i].weight = weight;
-    }
     fclose(fp);
 
-    // Read the query list file
+    // Read the query list file and process queries
     fp = fopen(queryFilePath, "r");
+
     if (fp == NULL) {
         fprintf(stderr, "Error opening file: %s\n", queryFilePath);
         return -1;
@@ -64,55 +57,41 @@ int main(int argc, char **argv) {
 
     char *line = NULL;
     size_t lineBuffSize = 0;
-    ssize_t lineSize;
 
-    while ((lineSize = getline(&line, &lineBuffSize, fp) != -1)) {
+    while (getline(&line, &lineBuffSize, fp) != -1) {
         queryCount++;
-    }
-    free(line);
+        char *query = strdup(line);
 
-    // Allocate memory for query words
-    char **queryWords = (char **)malloc(queryCount * sizeof(char *));
-    if (queryWords == NULL) {
-        fprintf(stderr, "Memory allocation error.\n");
-        return -1;
-    }
+        // Remove newline character from the query
+        if (query[strlen(query) - 1] == '\n') {
+            query[strlen(query) - 1] = '\0';
+        }
 
-    fseek(fp, 0, SEEK_SET);
-    for (int i = 0; i < queryCount; i++) {
-        getline(&queryWords[i], &lineBuffSize, fp);
-        // Remove newline character from the query word
-        queryWords[i][strcspn(queryWords[i], "\n")] = '\0';
-    }
-    fclose(fp);
+        printf("Query word: %s\n", query);
 
-    // Process queries
-    for (int i = 0; i < queryCount; i++) {
-        printf("Query word:%s\n", queryWords[i]);
-
-        int suggestionsCount = 0;
-        for (int j = 0; j < wordCount; j++) {
-            if (strncmp(dictionary[j].word, queryWords[i], strlen(queryWords[i])) == 0) {
-                printf("%s %d\n", dictionary[j].word, dictionary[j].weight);
-                suggestionsCount++;
-
-                if (suggestionsCount == 10) {
-                    break;  // Limit to the top 10 suggestions
-                }
+        int suggestions = 0;
+        // Search the dictionary for suggestions
+        for (int i = 0; i < wordCount; i++) {
+            if (strstr(dictionary[i].word, query) == dictionary[i].word) {
+                printf("%s %d\n", dictionary[i].word, dictionary[i].weight);
+                suggestions++;
+            }
+            if (suggestions >= MAX_SUGGESTIONS) {
+                break;
             }
         }
 
-        if (suggestionsCount == 0) {
+        if (suggestions == 0) {
             printf("No suggestion!\n");
         }
+
+        free(query);
     }
 
-    // Free allocated memory
-    for (int i = 0; i < queryCount; i++) {
-        free(queryWords[i]);
-    }
-    free(queryWords);
+    free(line);
+    fclose(fp);
 
+    // Free memory
     for (int i = 0; i < wordCount; i++) {
         free(dictionary[i].word);
     }
