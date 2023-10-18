@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
 
     char *dictionaryFilePath = argv[1];
     char *queryFilePath = argv[2];
-    
+
     int wordCount = 0;
     int queryCount = 0;
 
@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
     // Process queries
     for (int i = 0; i < queryCount; i++) {
         printf("Query word:%s\n", queryWords[i]);
-        
+
         int suggestionsCount = 0;
         for (int j = 0; j < wordCount; j++) {
             if (strncmp(dictionary[j].word, queryWords[i], strlen(queryWords[i])) == 0) {
