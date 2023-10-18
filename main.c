@@ -22,11 +22,11 @@ int main(int argc, char **argv) {
 
     char *dictionaryFilePath = argv[1];
     char *queryFilePath = argv[2];
-
+    
     int wordCount = 0;
     int queryCount = 0;
 
-    // Read the dictionary file
+    // Read the knowledge base file
     FILE *fp = fopen(dictionaryFilePath, "r");
     if (fp == NULL) {
         fprintf(stderr, "Error opening file: %s\n", dictionaryFilePath);
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    // Read the dictionary file again and store data
+    // Read the knowledge base file again and store data
     fseek(fp, 0, SEEK_SET);
     for (int i = 0; i < wordCount; i++) {
         fscanf(fp, "%s %d\n", word, &weight);
@@ -86,10 +86,10 @@ int main(int argc, char **argv) {
     }
     fclose(fp);
 
-    // Process queries and suggest words
+    // Process queries
     for (int i = 0; i < queryCount; i++) {
         printf("Query word:%s\n", queryWords[i]);
-
+        
         int suggestionsCount = 0;
         for (int j = 0; j < wordCount; j++) {
             if (strncmp(dictionary[j].word, queryWords[i], strlen(queryWords[i])) == 0) {
