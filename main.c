@@ -96,6 +96,20 @@ int main(int argc, char **argv) {
     //do search/sort/print, whatever you think you need to do to satisfy the requirements of the assignment!
     //loop through the query words and list suggestions for each query word if there are any
     //don't forget to free the memory before you quit the program!
+
+    ////////////////////////////////////////////////////////////////////////
+    ////////////////////////////// Free memory /////////////////////////////
+    ////////////////////////////////////////////////////////////////////////
+    for(int i = 0; i < wordCount; i++)
+    {
+        free(items[i].word);
+    }
+    free(items); // Free dictionary
+    for(int i = 0; i < queryCount; i++)
+    {
+        free(queries[i]);
+    }
+    free(queries); // Free queries
     
     
     //OUTPUT SPECS:
