@@ -210,24 +210,23 @@ int main(int argc, char **argv) {
     ////////////////////////////////////////////////////////////////////////
     //////////////////////////// Process queries ///////////////////////////
     ////////////////////////////////////////////////////////////////////////
+    Item* results = NULL; // Store suggestion results
     for(int i = 0; i < queryCount; i++)
     {
-        Item* result = binarySearch(items, wordCount, queries[i]);
+        results = binarySearch(items, wordCount, queries[i]);
         int suggestionsCount = 0;
 
         printf("Query word:%s\n", queries[i]);
         
         // Loop through the results
-        for (int i = 0; i < 10 && result[i].word != NULL; i++)
+        for (int i = 0; i < 10 && results[i].word != NULL; i++)
         {
-            printf("%s (%d)\n", result[i].word, result[i].weight);
+            printf("%s (%d)\n", results[i].word, results[i].weight);
             suggestionsCount++;
-            free(result[i].word);
         }
         if (suggestionsCount == 0) {
             printf("No suggestion!\n");
         }
-        free(result);
     }
     
 
@@ -244,6 +243,9 @@ int main(int argc, char **argv) {
         free(queries[i]);
     }
     free(queries); // Free queries
+    
+    // Free results
+    free(results);
 
     
     
