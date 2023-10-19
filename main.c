@@ -215,9 +215,13 @@ int main(int argc, char **argv) {
     ////////////////////////////////////////////////////////////////////////
     for(int i = 0; i < queryCount; i++)
     {
+        // Search in knowledge base
         Item* results = binarySearch(items, wordCount, queries[i]);
-        int suggestionsCount = 0;
 
+        // Sort the results based on the 'weight' field
+        sort(results, 0, 9);
+
+        int suggestionsCount = 0; // Store number of suggestions
         printf("Query word:%s\n", queries[i]);
         
         // Loop through the results
