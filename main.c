@@ -9,6 +9,74 @@ typedef struct item{
   int weight;
 }Item;
 
+// Comparison function for sorting items based on the 'word' field
+int compareItems(const void *a, const void *b) {
+    return strcmp(((Item *)a)->word, ((Item *)b)->word);
+}
+
+// Binary search function to find all items matching the query
+Item* binarySearch(Item* items, int n, char* query) {
+
+    Item* results = (Item*)malloc(10 * sizeof(Item));
+    if (results == NULL) {
+        fprintf(stderr, "Memory allocation failed.\n");
+        exit(1);
+    }
+
+    for (int i = 0; i < 10; i++) {
+        results[i].word = NULL; // Initialize the word field to NULL
+        results[i].weight = 0;
+    }
+
+    int count = 0;
+    int left = 0;
+    int right = n - 1;
+
+    while (left <= right) {
+        int mid = (left + right) / 2;
+        int cmp = strcmp(items[mid].word, query);
+
+        if (cmp == 0) {
+            // Match found, add to results array
+            results[count] = items[mid];
+            count++;
+            if (count >= 10) {
+                break;
+            }
+
+            // Check for other matches on the left side
+            int i = mid - 1;
+            while (i >= 0 && strcmp(items[i].word, query) == 0) {
+                results[count] = items[i];
+                count++;
+                if (count >= 10) {
+                    break;
+                }
+                i--;
+            }
+
+            // Check for other matches on the right side
+            i = mid + 1;
+            while (i < n && strcmp(items[i].word, query) == 0) {
+                results[count] = items[i];
+                count++;
+                if (count >= 10) {
+                    break;
+                }
+                i++;
+            }
+
+            break;
+        } else if (cmp < 0) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+
+    return results;
+}
+
 int main(int argc, char **argv) {
     //char *dictionaryFilePath = argv[1]; //this keeps the path to dictionary file
     //char *queryFilePath = argv[2]; //this keeps the path to the file that keeps a list of query wrods, 1 query per line
@@ -38,6 +106,11 @@ int main(int argc, char **argv) {
     
     // Allocate memory for your data structure, by the size of "wordCount"
     Item* items = (Item*)malloc(sizeof(Item)*wordCount);
+    if (items == NULL) {
+        fprintf(stderr, "Memory allocation error.\n");
+        return -1;
+    }
+
     
     //Read the file once more, this time to fill in the data into memory
     fseek(fp, 0, SEEK_SET);// rewind to the beginning of the file, before reading it line by line.
@@ -48,7 +121,8 @@ int main(int argc, char **argv) {
         fscanf(fp, "%s %d\n",word,&weight);
         
         // Store the dictionary words into your data structure
-        items[i].word = (char*)malloc(sizeof(char)*strlen(word));
+        items[i].word = strdup(word);
+        items[i].weight = weight;
     }
     //close the input file
     fclose(fp);
@@ -60,7 +134,7 @@ int main(int argc, char **argv) {
         
     //check if the file is accessible, just to make sure...
     if(fp == NULL){
-        fprintf(stderr, "Error opening file:%s\n","queries_1.txt");
+        fprintf(stderr, "Error opening file:%s\n","queryFilePath");
         return -1;
     }
 
@@ -75,6 +149,10 @@ int main(int argc, char **argv) {
     
     // Allocate memory for storing query words, by the size of "queryCount"
     char** queries = (char**)malloc(sizeof(char*)*queryCount);
+    if (queries == NULL) {
+        fprintf(stderr, "Memory allocation error.\n");
+        return -1;
+    }
     
 
     fseek(fp, 0, SEEK_SET);// rewind to the beginning of the file, before reading it line by line.
@@ -83,19 +161,46 @@ int main(int argc, char **argv) {
         fscanf(fp, "%s\n",word);
 
         // Store the query words in a list like data structure 
-        queries[i] = (char*)malloc(sizeof(char)*strlen(word));  
+        queries[i] = strdup(word);  
     }
     //close the input file
     fclose(fp);
 
     ////////////////////////////////////////////////////////////////////////
-    ///////////////////////// reading input is done ////////////////////////
+    //////////////////////// Sort the knowledge base ///////////////////////
     ////////////////////////////////////////////////////////////////////////
+    for(int i = 0; i < wordCount; i++)
+    {
+        for(int j = i+1; j < wordCount; j++)
+        {
+            if(strcmp(items[i].word, items[j].word) > 0)
+            {
+                char* temp = items[i].word;
+                items[i].word = items[j].word;
+                items[j].word = temp;
+            }
+        }
+    }
+
+    // Loop through the query words and list suggestions for each query word if there are any
+    for(int i = 0; i < queryCount; i++)
+    {
+        printf("Query word:%s\n", queries[i]);
+        //loop through the dictionary and find the words that are similar to the query word
+        for(int j = 0; j < wordCount; j++)
+        {
+            int suggestionsCount = 0;
+            if (strncmp(items[j].word, queries[i], strlen(queries[i])) == 0) {
+                printf("%s %d\n", items[j].word, items[j].weight);
+                suggestionsCount++;
+
+                if (suggestionsCount == 10) {
+                    break;  // Limit to the top 10 suggestions
+                }
+            }
+        }
+    }
     
-    //Now it is your turn to do the magic!!!
-    //do search/sort/print, whatever you think you need to do to satisfy the requirements of the assignment!
-    //loop through the query words and list suggestions for each query word if there are any
-    //don't forget to free the memory before you quit the program!
 
     ////////////////////////////////////////////////////////////////////////
     ////////////////////////////// Free memory /////////////////////////////
