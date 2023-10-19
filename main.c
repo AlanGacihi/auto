@@ -114,6 +114,8 @@ Item* binarySearch(Item* items, int n, char* query) {
     }
     printf("Count: %d   N: %d\n", count, n);
 
+    // Sort results
+    sort(results, 0, count - 1);
     return results;
 }
 
@@ -217,9 +219,6 @@ int main(int argc, char **argv) {
     {
         // Search in knowledge base
         Item* results = binarySearch(items, wordCount, queries[i]);
-
-        // Sort the results based on the 'weight' field
-        sort(results, 0, 9);
 
         int suggestionsCount = 0; // Store number of suggestions
         printf("Query word:%s\n", queries[i]);
