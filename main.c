@@ -68,6 +68,7 @@ Item* binarySearch(Item* items, int n, char* query) {
     int right = n - 1;
 
     while (left <= right) {
+        printf("Loop\n");
         int mid = (left + right) / 2;
         int cmp = strcmp(items[mid].word, query);
 
@@ -108,7 +109,7 @@ Item* binarySearch(Item* items, int n, char* query) {
             right = mid - 1;
         }
     }
-    printf("Count: %d/n", count);
+    printf("Count: %d   N: %d\n", count, n);
 
     return results;
 }
