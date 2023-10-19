@@ -205,27 +205,29 @@ int main(int argc, char **argv) {
     ////////////////////////////////////////////////////////////////////////
     sort(items, 0, wordCount-1);
 
-    // Loop through the query words and list suggestions for each query word if there are any
+    int n = sizeof(items) / sizeof(Item); // Store size
+
+    ////////////////////////////////////////////////////////////////////////
+    //////////////////////////// Process queries ///////////////////////////
+    ////////////////////////////////////////////////////////////////////////
     for(int i = 0; i < queryCount; i++)
     {
-        printf("Query word:%s\n", queries[i]);
+        Item* result = binarySearch(items, n, queries[i]);
         int suggestionsCount = 0;
-        //loop through the dictionary and find the words that are similar to the query word
-        for(int j = 0; j < wordCount; j++)
-        {
-            
-            if (strncmp(items[j].word, queries[i], strlen(queries[i])) == 0) {
-                printf("%s %d\n", items[j].word, items[j].weight);
-                suggestionsCount++;
 
-                if (suggestionsCount == 10) {
-                    break;  // Limit to the top 10 suggestions
-                }
-            }
+        printf("Query word:%s\n", queries[i]);
+        
+        // Loop through the results
+        for (int i = 0; i < 10 && result[i].word != NULL; i++)
+        {
+            printf("%s (%d)\n", result[i].word, result[i].weight);
+            suggestionsCount++;
+            free(result[i].word);
         }
         if (suggestionsCount == 0) {
             printf("No suggestion!\n");
         }
+        free(result);
     }
     
 
@@ -242,6 +244,7 @@ int main(int argc, char **argv) {
         free(queries[i]);
     }
     free(queries); // Free queries
+
     
     
     //OUTPUT SPECS:
