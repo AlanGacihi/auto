@@ -23,7 +23,7 @@ int partition(Item* items, int low, int high, int sortByWeight) {
         int i = (low - 1);
 
         for (int j = low; j <= high - 1; j++) {
-            if (items[j].weight < pivot) {
+            if (items[j].weight > pivot) {
                 i++;
                 swap(items, i, j);
             }
