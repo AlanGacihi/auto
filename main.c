@@ -107,8 +107,6 @@ Item* binarySearch(Item* items, int n, char* query) {
         }
     }
 
-    printf("Count: %d   N: %d\n", count, n);
-
     // Sort results
     sort(results, 0, count - 1);
 
@@ -203,10 +201,12 @@ int main(int argc, char **argv) {
     //close the input file
     fclose(fp);
 
+
     ////////////////////////////////////////////////////////////////////////
     //////////////////////// Sort the knowledge base ///////////////////////
     ////////////////////////////////////////////////////////////////////////
     sort(items, 0, wordCount-1);
+
 
     ////////////////////////////////////////////////////////////////////////
     //////////////////////////// Process queries ///////////////////////////
@@ -246,13 +246,6 @@ int main(int argc, char **argv) {
         free(queries[i]);
     }
     free(queries); // Free queries   
-    
-    //OUTPUT SPECS:
-    // use the following if no word to suggest: printf("No suggestion!\n");
-    // use the following to print a single line of outputs (assuming that the word and weight are stored in variables named word and weight, respectively): 
-    // printf("%s %d\n",word,weight);
-    // if there are more than 10 outputs to print, you should print the top 10 weighted outputs.
-    
-    printf("Done\n");
+        
     return 0;
 }
