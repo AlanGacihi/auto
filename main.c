@@ -115,22 +115,22 @@ Item* binarySearch(Item* items, int n, char* query) {
 }
 
 int main(int argc, char **argv) {
-    //char *dictionaryFilePath = argv[1]; //this keeps the path to dictionary file
-    //char *queryFilePath = argv[2]; //this keeps the path to the file that keeps a list of query wrods, 1 query per line
+    char *dictionaryFilePath = argv[1]; //this keeps the path to dictionary file
+    char *queryFilePath = argv[2]; //this keeps the path to the file that keeps a list of query wrods, 1 query per line
     int wordCount=0; //this variable will keep a count of words in the dictionary, telling us how much memory to allocate
     int queryCount=0; //this variable will keep a count of queries in the query file, telling us how much memory to allocate for the query words
     
     ////////////////////////////////////////////////////////////////////////
     ///////////////////////// read dictionary file /////////////////////////
     ////////////////////////////////////////////////////////////////////////
-    FILE *fp = fopen("simpsons_rand.txt", "r");
+    FILE *fp = fopen(dictionaryFilePath, "r");
     char *line = NULL; //variable to be used for line counting
     size_t lineBuffSize = 0; //variable to be used for line counting
     ssize_t lineSize; //variable to be used for line counting
     
     //check if the file is accessible, just to make sure...
     if(fp == NULL){
-        fprintf(stderr, "Error opening file:%s\n","dictionaryFilePath");
+        fprintf(stderr, "Error opening file:%s\n",dictionaryFilePath);
         return -1;
     }
 
@@ -167,11 +167,11 @@ int main(int argc, char **argv) {
     ////////////////////////////////////////////////////////////////////////
     ///////////////////////// read query list file /////////////////////////
     ////////////////////////////////////////////////////////////////////////
-    fp = fopen("queries_1.txt", "r");
+    fp = fopen(queryFilePath, "r");
         
     //check if the file is accessible, just to make sure...
     if(fp == NULL){
-        fprintf(stderr, "Error opening file:%s\n","queryFilePath");
+        fprintf(stderr, "Error opening file:%s\n",queryFilePath);
         return -1;
     }
 
@@ -215,7 +215,7 @@ int main(int argc, char **argv) {
     for(int i = 0; i < queryCount; i++)
     {
         // Search in knowledge base
-        Item* results = binarySearch(items, wordCount, queries[i]);
+        Item* results = binarySearch(items,wordCount,queries[i]);
 
         int suggestionsCount = 0; // Store number of suggestions
         printf("Query word:%s\n", queries[i]);
