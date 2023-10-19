@@ -44,11 +44,6 @@ void sort(Item* items, int low, int high)
     }
 }
 
-// Comparison function for sorting items based on the 'word' field
-int compareItems(const void *a, const void *b) {
-    return strcmp(((Item *)a)->word, ((Item *)b)->word);
-}
-
 // Binary search function to find all items matching the query
 Item* binarySearch(Item* items, int n, char* query) {
 
@@ -69,7 +64,7 @@ Item* binarySearch(Item* items, int n, char* query) {
 
     while (left <= right) {
         int mid = left + (right - left) / 2; // To avoid potential integer overflow
-        int cmp = strcmp(items[mid].word, query);
+        int cmp = strncmp(items[mid].word, query, strlen(query));
 
         if (cmp == 0) {
             // Match found, add to results array
@@ -82,7 +77,7 @@ Item* binarySearch(Item* items, int n, char* query) {
 
             // Check for other matches on the left side
             int i = mid - 1;
-            while (i >= 0 && strcmp(items[i].word, query) == 0) {
+            while (i >= 0 && strncmp(items[i].word, query, strlen(query)) == 0) {
                 results[count].word = strdup(items[i].word);
                 results[count].weight = items[i].weight;
                 count++;
@@ -94,7 +89,7 @@ Item* binarySearch(Item* items, int n, char* query) {
 
             // Check for other matches on the right side
             i = mid + 1;
-            while (i < n && strcmp(items[i].word, query) == 0) {
+            while (i < n && strncmp(items[i].word, query, strlen(query)) == 0) {
                 results[count].word = strdup(items[i].word);
                 results[count].weight = items[i].weight;
                 count++;
