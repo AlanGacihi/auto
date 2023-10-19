@@ -107,8 +107,19 @@ Item* binarySearch(Item* items, int n, char* query) {
         }
     }
 
-    // Sort results
-    sort(results, 0, count - 1);
+    // Sort results based on weight
+    for(int i = 0; i < 10; i++)
+    {
+        for(int j = i+1; j < 10; j++)
+        {
+            if(results[i].weight < results[j].weight)
+            {
+                Item temp = results[i];
+                results[i] = results[j];
+                results[j] = temp;
+            }
+        }
+    }
 
     return results;
 }
