@@ -9,6 +9,41 @@ typedef struct item{
   int weight;
 }Item;
 
+
+// Swap two items in the 'items' array.
+void swap(Item* items, int i, int j) 
+{
+    Item temp = items[i];
+    items[i] = items[j];
+    items[j] = temp;
+}
+
+// Partition the 'items' array
+int partition(Item* items, int low, int high)
+{
+    char* pivot = items[high].word;
+    int i = (low - 1);
+
+    for (int j = low; j <= high - 1; j++) {
+        if (strcmp(items[j].word, pivot) < 0) {
+            i++;
+            swap(items, i, j);
+        }
+    }
+    swap(items, i + 1, high);
+    return (i + 1);
+}
+
+// Sort an array of Item structures
+void sort(Item* items, int low, int high)
+{
+    if (low < high) {
+        int pi = partition(items, low, high);
+        sort(items, low, pi - 1);
+        sort(items, pi + 1, high);
+    }
+}
+
 // Comparison function for sorting items based on the 'word' field
 int compareItems(const void *a, const void *b) {
     return strcmp(((Item *)a)->word, ((Item *)b)->word);
@@ -145,7 +180,6 @@ int main(int argc, char **argv) {
     }
     free(line); //getline internally allocates memory, so we need to free it here so as not to leak memory!!
 
-
     
     // Allocate memory for storing query words, by the size of "queryCount"
     char** queries = (char**)malloc(sizeof(char*)*queryCount);
@@ -169,27 +203,17 @@ int main(int argc, char **argv) {
     ////////////////////////////////////////////////////////////////////////
     //////////////////////// Sort the knowledge base ///////////////////////
     ////////////////////////////////////////////////////////////////////////
-    for(int i = 0; i < wordCount; i++)
-    {
-        for(int j = i+1; j < wordCount; j++)
-        {
-            if(strcmp(items[i].word, items[j].word) > 0)
-            {
-                char* temp = items[i].word;
-                items[i].word = items[j].word;
-                items[j].word = temp;
-            }
-        }
-    }
+    sort(items, 0, wordCount-1);
 
     // Loop through the query words and list suggestions for each query word if there are any
     for(int i = 0; i < queryCount; i++)
     {
         printf("Query word:%s\n", queries[i]);
+        int suggestionsCount = 0;
         //loop through the dictionary and find the words that are similar to the query word
         for(int j = 0; j < wordCount; j++)
         {
-            int suggestionsCount = 0;
+            
             if (strncmp(items[j].word, queries[i], strlen(queries[i])) == 0) {
                 printf("%s %d\n", items[j].word, items[j].weight);
                 suggestionsCount++;
@@ -198,6 +222,9 @@ int main(int argc, char **argv) {
                     break;  // Limit to the top 10 suggestions
                 }
             }
+        }
+        if (suggestionsCount == 0) {
+            printf("No suggestion!\n");
         }
     }
     
