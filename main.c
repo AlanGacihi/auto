@@ -4,56 +4,66 @@
 
 #define BUFSIZE 256
 
-typedef struct item{
-  char *word;
-  int weight;
-}Item;
-
+typedef struct item {
+    char *word;
+    int weight;
+} Item;
 
 // Swap two items in the 'items' array.
-void swap(Item* items, int i, int j) 
-{
+void swap(Item* items, int i, int j) {
     Item temp = items[i];
     items[i] = items[j];
     items[j] = temp;
 }
 
 // Partition the 'items' array
-int partition(Item* items, int low, int high)
-{
-    char* pivot = items[high].word;
-    int i = (low - 1);
+int partition(Item* items, int low, int high, int sortByWeight) {
+    if (sortByWeight) {
+        int pivot = items[high].weight;
+        int i = (low - 1);
 
-    for (int j = low; j <= high - 1; j++) {
-        if (strcmp(items[j].word, pivot) < 0) {
-            i++;
-            swap(items, i, j);
+        for (int j = low; j <= high - 1; j++) {
+            if (items[j].weight < pivot) {
+                i++;
+                swap(items, i, j);
+            }
         }
+        swap(items, i + 1, high);
+        return (i + 1);
+    } else {
+        char* pivot = items[high].word;
+        int i = (low - 1);
+
+        for (int j = low; j <= high - 1; j++) {
+            if (strcmp(items[j].word, pivot) < 0) {
+                i++;
+                swap(items, i, j);
+            }
+        }
+        swap(items, i + 1, high);
+        return (i + 1);
     }
-    swap(items, i + 1, high);
-    return (i + 1);
 }
 
 // Sort an array of Item structures
-void sort(Item* items, int low, int high)
-{
+void sort(Item* items, int low, int high, int sortByWeight) {
     if (low < high) {
-        int pi = partition(items, low, high);
-        sort(items, low, pi - 1);
-        sort(items, pi + 1, high);
+        int pi = partition(items, low, high, sortByWeight);
+        sort(items, low, pi - 1, sortByWeight);
+        sort(items, pi + 1, high, sortByWeight);
     }
 }
 
 // Binary search function to find all items matching the query
 Item* binarySearch(Item* items, int n, char* query) {
 
-    Item* results = (Item*)malloc(10 * sizeof(Item));
+    Item* results = (Item*)malloc(n * sizeof(Item));
     if (results == NULL) {
         fprintf(stderr, "Memory allocation failed.\n");
         exit(1);
     }
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < n; i++) {
         results[i].word = NULL; // Initialize the word field to NULL
         results[i].weight = 0;
     }
@@ -71,9 +81,6 @@ Item* binarySearch(Item* items, int n, char* query) {
             results[count].word = strdup(items[mid].word);
             results[count].weight = items[mid].weight;
             count++;
-            if (count >= 10) {
-                break;
-            }
 
             // Check for other matches on the left side
             int i = mid - 1;
@@ -81,9 +88,6 @@ Item* binarySearch(Item* items, int n, char* query) {
                 results[count].word = strdup(items[i].word);
                 results[count].weight = items[i].weight;
                 count++;
-                if (count >= 10) {
-                    break;
-                }
                 i--;
             }
 
@@ -93,9 +97,6 @@ Item* binarySearch(Item* items, int n, char* query) {
                 results[count].word = strdup(items[i].word);
                 results[count].weight = items[i].weight;
                 count++;
-                if (count >= 10) {
-                    break;
-                }
                 i++;
             }
 
@@ -108,18 +109,7 @@ Item* binarySearch(Item* items, int n, char* query) {
     }
 
     // Sort results based on weight
-    for(int i = 0; i < 10; i++)
-    {
-        for(int j = i+1; j < 10; j++)
-        {
-            if(results[i].weight < results[j].weight)
-            {
-                Item temp = results[i];
-                results[i] = results[j];
-                results[j] = temp;
-            }
-        }
-    }
+    sort(results, 0, count - 1, 1);
 
     return results;
 }
@@ -216,7 +206,7 @@ int main(int argc, char **argv) {
     ////////////////////////////////////////////////////////////////////////
     //////////////////////// Sort the knowledge base ///////////////////////
     ////////////////////////////////////////////////////////////////////////
-    sort(items, 0, wordCount-1);
+    sort(items, 0, wordCount-1, 0);
 
 
     ////////////////////////////////////////////////////////////////////////
