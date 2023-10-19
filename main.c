@@ -68,7 +68,7 @@ Item* binarySearch(Item* items, int n, char* query) {
     int right = n - 1;
 
     while (left <= right) {
-        printf("Loop\n");
+        //printf("Loop\n");
         int mid = (left + right) / 2;
         int cmp = strcmp(items[mid].word, query);
 
@@ -207,14 +207,12 @@ int main(int argc, char **argv) {
     ////////////////////////////////////////////////////////////////////////
     sort(items, 0, wordCount-1);
 
-    int n = sizeof(items) / sizeof(Item); // Store size
-
     ////////////////////////////////////////////////////////////////////////
     //////////////////////////// Process queries ///////////////////////////
     ////////////////////////////////////////////////////////////////////////
     for(int i = 0; i < queryCount; i++)
     {
-        Item* result = binarySearch(items, n, queries[i]);
+        Item* result = binarySearch(items, wordCount, queries[i]);
         int suggestionsCount = 0;
 
         printf("Query word:%s\n", queries[i]);
