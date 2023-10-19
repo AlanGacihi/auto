@@ -108,7 +108,7 @@ Item* binarySearch(Item* items, int n, char* query) {
             right = mid - 1;
         }
     }
-    print("Count: %d/n", count);
+    printf("Count: %d/n", count);
 
     return results;
 }
