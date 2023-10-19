@@ -74,7 +74,8 @@ Item* binarySearch(Item* items, int n, char* query) {
 
         if (cmp == 0) {
             // Match found, add to results array
-            results[count] = items[mid];
+            results[count].word = strdup(items[mid].word);
+            results[count].weight = items[mid].weight;
             count++;
             if (count >= 10) {
                 break;
@@ -83,7 +84,8 @@ Item* binarySearch(Item* items, int n, char* query) {
             // Check for other matches on the left side
             int i = mid - 1;
             while (i >= 0 && strcmp(items[i].word, query) == 0) {
-                results[count] = items[i];
+                results[count].word = strdup(items[i].word);
+                results[count].weight = items[i].weight;
                 count++;
                 if (count >= 10) {
                     break;
@@ -94,7 +96,8 @@ Item* binarySearch(Item* items, int n, char* query) {
             // Check for other matches on the right side
             i = mid + 1;
             while (i < n && strcmp(items[i].word, query) == 0) {
-                results[count] = items[i];
+                results[count].word = strdup(items[i].word);
+                results[count].weight = items[i].weight;
                 count++;
                 if (count >= 10) {
                     break;
@@ -210,10 +213,9 @@ int main(int argc, char **argv) {
     ////////////////////////////////////////////////////////////////////////
     //////////////////////////// Process queries ///////////////////////////
     ////////////////////////////////////////////////////////////////////////
-    Item* results = NULL; // Store suggestion results
     for(int i = 0; i < queryCount; i++)
     {
-        results = binarySearch(items, wordCount, queries[i]);
+        Item* results = binarySearch(items, wordCount, queries[i]);
         int suggestionsCount = 0;
 
         printf("Query word:%s\n", queries[i]);
@@ -223,10 +225,12 @@ int main(int argc, char **argv) {
         {
             printf("%s (%d)\n", results[i].word, results[i].weight);
             suggestionsCount++;
+            free(results[i].word);
         }
         if (suggestionsCount == 0) {
             printf("No suggestion!\n");
         }
+        free(results);
     }
     
 
@@ -242,12 +246,7 @@ int main(int argc, char **argv) {
     {
         free(queries[i]);
     }
-    free(queries); // Free queries
-    
-    // Free results
-    free(results);
-
-    
+    free(queries); // Free queries   
     
     //OUTPUT SPECS:
     // use the following if no word to suggest: printf("No suggestion!\n");
