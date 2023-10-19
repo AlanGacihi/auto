@@ -225,10 +225,14 @@ int main(int argc, char **argv) {
         {
             printf("%s %d\n", results[i].word, results[i].weight);
             suggestionsCount++;
-            free(results[i].word);
         }
         if (suggestionsCount == 0) {
             printf("No suggestion!\n");
+        }
+
+        // Free results' memory
+        for (int i = 0; i < wordCount; i++) {
+            free(results[i].word);
         }
         free(results);
     }
